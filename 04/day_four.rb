@@ -207,12 +207,16 @@ input.each_line.with_index do |row, index|
 end
 
 sum = 0
+copies = []
 games.each_with_index do |card, index|
-  matches = 0
-  card["game"].each do |n|
-    matches += 1 if card["answers"].include?(n)
-  end
+  # matches = 0
+  # card["game"].each do |n|
+  #   matches += 1 if card["answers"].include?(n)
+  # end
+  matches = (card["game"] & card["answers"]).length
+  copies << ((index+1)..(index+matches)).to_a if matches - 1 >= 0
   p "Card #{index+1} has #{matches} matches"
   sum += (2 ** (matches - 1)) if matches - 1 >= 0
 end
+p copies.flatten!.sort
 p sum
