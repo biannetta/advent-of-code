@@ -214,9 +214,18 @@ games.each_with_index do |card, index|
   #   matches += 1 if card["answers"].include?(n)
   # end
   matches = (card["game"] & card["answers"]).length
+
   copies << ((index+1)..(index+matches)).to_a if matches - 1 >= 0
+  copies.flatten!
+
+  p copies.count(index)
+  (copies.count(index) - 1).times {
+    copies << ((index+1)..(index+matches)).to_a if matches - 1 >= 0
+  }
+  copies.flatten!
+
   p "Card #{index+1} has #{matches} matches"
   sum += (2 ** (matches - 1)) if matches - 1 >= 0
 end
-p copies.flatten!.sort
+p copies.count
 p sum
