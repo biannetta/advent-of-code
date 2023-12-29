@@ -195,37 +195,29 @@ EOF
 
 games = []
 input.each_line.with_index do |row, index|
-  games[index] = {
-    "game" => [],
-    "answers" => []
-  }
+  games[index] = {}
 
   block = row.split(': ')[1].chomp.split(' | ')
 
-  games[index]["game"] = block[0].split(' ').map(&:to_i).sort
-  games[index]["answers"] = block[1].split(' ').map(&:to_i).sort
+  games[index][:game] = block[0].split(' ').map(&:to_i)
+  games[index][:winners] = block[1].split(' ').map(&:to_i)
 end
 
 sum = 0
-copies = []
+copies = Hash.new { |hash, key| hash[key] = 1 }
 games.each_with_index do |card, index|
-  # matches = 0
-  # card["game"].each do |n|
-  #   matches += 1 if card["answers"].include?(n)
-  # end
-  matches = (card["game"] & card["answers"]).length
+  matches = (card[:game] & card[:winners]).size
 
-  copies << ((index+1)..(index+matches)).to_a if matches - 1 >= 0
-  copies.flatten!
-
-  p copies.count(index)
-  (copies.count(index) - 1).times {
-    copies << ((index+1)..(index+matches)).to_a if matches - 1 >= 0
-  }
-  copies.flatten!
-
-  p "Card #{index+1} has #{matches} matches"
-  sum += (2 ** (matches - 1)) if matches - 1 >= 0
+  copies[index].times do 
+    matches.times do |i|
+      copies[index + 1 + i] += 1
+    end
+  end
+  
+  # p "Card #{index+1} has #{matches} matches"
+  sum += (2 ** (matches - 1)) if matches > 0
 end
-p copies.count
+p games[0]
+p copies
+p copies.values.sum
 p sum
