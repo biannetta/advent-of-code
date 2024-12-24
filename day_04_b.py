@@ -140,34 +140,43 @@ ASASXSAMXAMAMASAMAMMMSMMASMMSMXAXMAMASAAAAASMXSAMAXAAASXMXSAMSAMSASASXMASAMXAAMM
 SMAMMMMXAMMAMXSXSSXMAXXSMMXAMXSMMSAMXSXMSSMMMXSAMXSMMMXXSASXSXSAMXMMXMMXSXMMSMSXSMXSXXMASMSXSSSXMASMXXSAMXSMMSSSMXSXSXSMMSXMASMXSAMSMMSMSMMM"""
 
 directions = [
-  (0,-1),   # Left
-  (0,1),    # Right
-  (-1,0),   # Up
-  (1,0),    # Down
-  (-1,-1),  # Up-Left
-  (1,-1),   # Down-Left
-  (-1,1),   # Up-Right
-  (1,1)     # Down-Right
+  (-1,-1),  # Top-Left
+  (1,-1),   # Bottom-Left
+  (-1,1),   # Top-Right
+  (1,1)     # Bottom-Right
 ]
 grid = [list(line.strip()) for line in puzzleInput.splitlines()]
 rows = len(grid)
 cols = len(grid[0])
-word = "XMAS"
+midpoint = "A"
+word = "MAS"
 count = 0
 
-def is_valid(curX, curY, dX, dY):
-  return 0 <= curX + (len(word)-1)*dX < rows and 0 <= curY + (len(word)-1)*dY < cols
-
-def match_word(curX, curY, dX, dY):
-  for i in range(len(word)):
-    if grid[curX + i*dX][curY + i*dY] != word[i]:
+def is_valid(curX, curY):
+  for dX, dY in directions:
+    if not(0 <= curX + 1*dX < rows and 0 <= curY + 1*dY < cols):
       return False
   return True
 
+def match_word(curX, curY):
+  topLeft = (curX + directions[0][0], curY + directions[0][1])
+  bottomLeft = (curX + directions[1][0], curY + directions[1][1])
+  topRight = (curX + directions[2][0], curY + directions[2][1])
+  bottomRight = (curX + directions[3][0], curY + directions[3][1])
+
+  posSlope = grid[topRight[0]][topRight[1]]+"A"+grid[bottomLeft[0]][bottomLeft[1]]
+  negSlope = grid[topLeft[0]][topLeft[1]]+"A"+grid[bottomRight[0]][bottomRight[1]]
+  
+  if (posSlope == word or posSlope[::-1] == word) and (negSlope == word or negSlope[::-1] == word):
+    return True
+  return False
+
 for i in range(rows):
   for j in range(cols):
-    for dx, dy in directions:
-      if is_valid(i,j,dx,dy) and match_word(i,j,dx,dy):
-        count +=1
+    if grid[i][j] == midpoint:
+      if is_valid(i,j):
+          if match_word(i,j):
+            print(i,j)
+            count+=1
 
 print(count)
